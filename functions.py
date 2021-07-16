@@ -210,7 +210,7 @@ def movb(data, l, k1=44, k2=45, k3=46, k4=47):
 def jc(data, cond, l):
 	bit = 0 if 'n' in cond[0] else 1
 	byte = 0
-	for i in "igle":
+	for i in "rabzigle":
 		byte *= 2
 		byte += bit if i in cond else (bit + 1) % 2
 	result = list(args.jump(23, data, l + 1, to_rebuild))

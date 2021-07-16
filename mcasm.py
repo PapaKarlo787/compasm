@@ -105,7 +105,7 @@ if __name__ == "__main__":
 		parser = argparse.ArgumentParser(description='OzComp Compiler')
 		parser.add_argument("inf", help="input file")
 		parser.add_argument("outf", help="output file")
-		parser.add_argument("org", type=int, default=0,
+		parser.add_argument("org", type=int, default=0x80000000,
 							help="open file", nargs='?')
 		cmd = parser.parse_args()
 		start(cmd.inf)
