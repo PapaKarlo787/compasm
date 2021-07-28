@@ -3,9 +3,8 @@ import argparse
 import sys
 import os
 import nums_to_bytes as ntb
-from args import label_re
+import args
 from functions import *
-from extensions import *
 
 commands = {"add": add, "sub": sub, "mul": mul, "div": div, "mov": mov,
 			"and": and_, "or": or_, "xor": xor, "cmp": cmp_, "int": int_,
@@ -21,11 +20,10 @@ commands = {"add": add, "sub": sub, "mul": mul, "div": div, "mov": mov,
 			"fcmp": fcmp_, "fpow": fpow_, "play": play, "nplay": nplay,
 			"db": db, "df": df, "icvtf": icvtf, "fcvti": fcvti, "dw": dw,
 			"movw": movw, "pushai": pushai, "popai": popai, "popaf": popaf,
-			"pushaf": pushaf, "rpix": rpix}
+			"pushaf": pushaf, "rpix": rpix, "nop": nop}
 
-cmd = commands
 
-pattern = re.compile(r"\".*\"|\[|\]|\+|-?[\w\.]+|,|:|;.*|-|\$")
+pattern = re.compile(r"\".*\"|\[|\]|\+|\*|-?[\w\.]+|,|:|;.*|-|\$")
 
 
 def manage_line(data):
@@ -37,24 +35,19 @@ def manage_line(data):
 	if data[0] in commands:
 		data_base += commands[data[0]](data[1:], len(data_base))
 	elif len(data) == 2 and data[1] == ":":
-		if data[0][0] == ".":
-			data[0] = args.last_label + data[0]
-		else:
-			args.last_label = data[0]
-		if data[0] in labels:
+		data[0] = args.get_norm_lable(data[0], True)
+		if data[0] in lables:
 			raise Exception("Label '{}' already presents".format(data[0]))
-		if not re.match(label_re, data[0]):
-			print(data[0])
-			raise Exception("Wrong label name")
-		labels[data[0]] = len(data_base)
+		lables[data[0]] = len(data_base)
 	elif re.match("jn?(e?g?l?i?)*$", data[0]):
 		data_base += jc(data[1:], data[0][1:], len(data_base))
 	elif data[0] == "include" and len(data) == 2 and "\"\"" == data[1][0]+data[1][-1]:
 		nl = args.nl
 		try:
 			start(data[1][1:-1])
-		except Exception as e:
 			args.nl = nl+1
+		except Exception as e:
+			args.nl = nl
 			raise e
 	elif data[0] == "times":
 		data_base += times(data[1:], len(data_base), commands)
@@ -62,11 +55,14 @@ def manage_line(data):
 		raise Exception
 
 
+
+
 def start(fn, visited=[]):
 	args.nl = 1
-	if os.path.abspath(fn) in visited:
+	fn = os.path.abspath(fn)
+	if fn in visited:
 		raise Exception("file {} already included".format(fn))
-	visited.append(os.path.abspath(fn))
+	visited.append(fn)
 	with open(fn) as f:
 		for l in f:
 			try:
@@ -74,24 +70,32 @@ def start(fn, visited=[]):
 				for i in range(len(l)):
 					if not i % 2:
 						l[i] = l[i].lower()
-				l = "\"".join(l)
-				manage_line(pattern.findall(l))
+				manage_line(pattern.findall("\"".join(l)))
 				args.nl += 1
 			except Exception as e:
 				msg = str(e) if str(e) else "Wrong line"
 				raise Exception("{}: {} (line {})".format(fn, msg, args.nl))
 
 
-def add_labels(org):
+def add_lables(org):
 	global nl, data_base
 	for d in to_rebuild:
-		if d[0] not in labels:
-			raise Exception("No such label - {} (line {})".format(d[0], d[2]))
-		x = list(data_base[d[1]:d[1]+4])
-		for i in range(4):
-			x[i] <<= i * 8
-		result = ntb.int_to_bytes(labels[d[0]]+org+sum(x))
-		data_base = data_base[:d[1]] + result + data_base[d[1]+4:]
+		if d[-1] == -1:
+			set_value(d[0], d[1])
+			continue
+		if d[0][d[-1]][0] == "$":
+			d[0][d[-1]] = str(int(d[0][d[-1]][1:]) + org)
+		else:
+			if d[0][d[-1]] not in lables:
+				raise Exception("No such lable - {} (line {})".format(d[0][d[-1]], d[2]))
+			d[0][d[-1]] = str(lables[d[0][d[-1]]] + org)
+			d[-1] = -1
+
+
+def set_value(val, n):
+	global data_base
+	val = ntb.int_to_bytes(eval("".join(val)))
+	data_base = data_base[:n] + val + data_base[n+4:]
 
 
 def save(fn):
@@ -109,7 +113,7 @@ if __name__ == "__main__":
 							help="open file", nargs='?')
 		cmd = parser.parse_args()
 		start(cmd.inf)
-		add_labels(cmd.org)
+		add_lables(cmd.org)
 		save(cmd.outf)
 	except Exception as e:
 		print(e)

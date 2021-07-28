@@ -1,8 +1,10 @@
 import nums_to_bytes as ntb
 import args
 import re
+import copy
 
-labels = {}
+
+lables = {}
 to_rebuild = []
 data_base = b''
 
@@ -89,16 +91,19 @@ def mod(data, l):
 	return ariphmetics(data, l, 27, 28)
 
 
-def jmp(data, l):
-	return args.jump(22, data, l, to_rebuild)
+def jmp(data, l, k1=22, k2=95):
+	try:
+		return bytes([k2]) + args.r(data)
+	except Exception:
+		return args.jump(k1, data, l, to_rebuild)
 
 
 def loop(data, l):
-	return args.jump(24, data, l, to_rebuild)
+	return jmp(data, l, 24, 97)
 
 
 def call(data, l):
-	return lprint(data, l, 40, 104)
+	return jmp(data, l, 40, 104)
 
 
 def play(data, l):
@@ -144,6 +149,10 @@ def cls(data, l):
 	return bytes([58])
 
 
+def nop(data, l):
+	return bytes([255])
+
+
 def push(data, l, k=25):
 	return bytes([k]) + args.r(data)
 
@@ -173,10 +182,9 @@ def point(data, l):
 
 
 def mov(data, l, k1=8, k2=9, k3=10, k4=11, k5=12, k6=13):
-	try:
+	if data[2]+data[-1] != "[]" and data[0]+data[-3] != "[]":
 		return ariphmetics(data, l, k3, k4, k1 != 8)
-	except Exception:
-		return movb(data, l, k1, k2, k5, k6)
+	return movb(data, l, k1, k2, k5, k6)
 
 
 def icvtf(data, l):
@@ -213,7 +221,7 @@ def jc(data, cond, l):
 	for i in "rabzigle":
 		byte *= 2
 		byte += bit if i in cond else (bit + 1) % 2
-	result = list(args.jump(23, data, l + 1, to_rebuild))
+	result = list(jmp(data, l + 1, 23, 96))
 	result.insert(1, byte)
 	return bytes(result)
 
@@ -222,11 +230,8 @@ def print_(data, l, n=29):
 	return bytes([n]) + args.r(data)
 
 
-def lprint(data, l, n1=30, n2=103):
-	try:
-		return print_(data, l, n2)
-	except Exception:
-		return args.jump(n1, data, l, to_rebuild)
+def lprint(data, l):
+	return jmp(data, l, 30, 103)
 
 
 def delay(data, l, k1=31, k2=32):
@@ -288,6 +293,56 @@ def setc(data, l, k=(37, 38)):
 		return bytes([k[0]]) + args.rr(data)
 	except Exception:
 		return bytes([k[1]]) + args.cc(data)
+
+
+def dd(data, l, f=args._dd):
+	res = b''
+	d = []
+	for x in data:
+		if x == ",":
+			if not d:
+				raise Exception("Missed operand")
+			res += f(d, l+len(res), to_rebuild)
+			d = []
+		else:
+			d.append(x)
+			continue
+	res += f(d, l+len(res), to_rebuild)
+	return res
+
+
+def db(data, l):
+	return dd(data, l, args._db)
+
+
+def dw(data, l):
+	return dd(data, l, args._dw)
+
+
+def df(data, l):
+	return dd(data, l, args._df)
+
+
+def long_(data, l):
+	if re.match(int_re, data[0]):
+		return num_to_bytes(to_int(data[0]))
+	raise Exception
+
+
+def times(data, l, cmd):
+	global to_rebuild
+	len_rebuilds = len(to_rebuild)
+	data_ = cmd[data[0]](data[1:-1], l)
+	if re.match(args.int_re, data[-1]):
+		n = args.to_int(data[-1])
+		rebuilds = to_rebuild[len_rebuilds:]
+		for i in range(1, n):
+			rebuilds = copy.deepcopy(rebuilds)
+			for r in rebuilds:
+				r[1] += len(data_)
+			to_rebuild += rebuilds
+		return data_ * n
+	raise Exception
 
 
 def rpix(data, l):
