@@ -103,7 +103,7 @@ def loop(data, l):
 
 
 def call(data, l):
-	return jmp(data, l, 40, 104)
+	return jmp(data, l, 40, 98)
 
 
 def play(data, l):
@@ -153,8 +153,11 @@ def nop(data, l):
 	return bytes([255])
 
 
-def push(data, l, k=25):
-	return bytes([k]) + args.r(data)
+def push(data, l, k1=25, k2=104):
+	try:
+		return bytes([k1]) + args.r(data)
+	except Exception:
+		return bytes([k2]) + args.get_const(data, l+1, to_rebuild, 0)
 
 
 def pop(data, l):
@@ -193,6 +196,16 @@ def icvtf(data, l):
 
 def fcvti(data, l):
 	return bytes([94]) + args.rr(data)
+
+
+def mzer(data, l):
+	try:
+		return bytes([111]) + args.rc(data, l, to_rebuild, False)
+	except Exception:
+		data = dd(data, l)
+		if len(data) == 8:
+			return bytes([112]) + data
+	raise Exception
 
 
 def fmov(data, l):
@@ -350,3 +363,11 @@ def rpix(data, l):
 		return bytes([110]) + args.rcb(data)
 	except Exception:
 		return bytes([109]) + args.rr(data)
+
+
+def test(data, l):
+	return bytes([113]) + args.r(data)
+
+
+def ftest(data, l):
+	return bytes([114]) + args.r(data)

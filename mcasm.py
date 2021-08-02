@@ -20,7 +20,8 @@ commands = {"add": add, "sub": sub, "mul": mul, "div": div, "mov": mov,
 			"fcmp": fcmp_, "fpow": fpow_, "play": play, "nplay": nplay,
 			"db": db, "df": df, "icvtf": icvtf, "fcvti": fcvti, "dw": dw,
 			"movw": movw, "pushai": pushai, "popai": popai, "popaf": popaf,
-			"pushaf": pushaf, "rpix": rpix, "nop": nop}
+			"pushaf": pushaf, "rpix": rpix, "nop": nop, "mzer": mzer,
+			"test": test, "ftest": ftest}
 
 
 pattern = re.compile(r"\".*\"|\[|\]|\+|\*|-?[\w\.]+|,|:|;.*|-|\$")
