@@ -149,6 +149,14 @@ def cls(data, l):
 	return bytes([58])
 
 
+def millis(data, l):
+	return bytes([117])
+
+
+def micros(data, l):
+	return bytes([118])
+
+
 def nop(data, l):
 	return bytes([255])
 
@@ -178,6 +186,18 @@ def print_int(data, l):
 
 def scol(data, l):
 	return bytes([66]) + args.c(data)
+
+
+def get_time(data, l):
+	if len(data) != 5 or data[3] != ",":
+		raise Exception
+	return bytes([115]) + args.rr(data[:3]) + args.r(data[4:])
+
+
+def set_time(data, l):
+	if len(data) != 5 or data[3] != ",":
+		raise Exception
+	return bytes([116]) + args.rr(data[:3]) + args.r(data[4:])
 
 
 def point(data, l):
