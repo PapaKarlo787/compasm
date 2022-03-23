@@ -189,15 +189,11 @@ def scol(data, l):
 
 
 def get_time(data, l):
-	if len(data) != 5 or data[3] != ",":
-		raise Exception
-	return bytes([115]) + args.rr(data[:3]) + args.r(data[4:])
+	return bytes([115]) + args.r(data)
 
 
 def set_time(data, l):
-	if len(data) != 5 or data[3] != ",":
-		raise Exception
-	return bytes([116]) + args.rr(data[:3]) + args.r(data[4:])
+	return bytes([116]) + args.r(data)
 
 
 def point(data, l):
