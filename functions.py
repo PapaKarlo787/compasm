@@ -145,6 +145,18 @@ def gkey(data, l):
 	return bytes([36])
 
 
+def gmice(data, l):
+	return bytes([121])
+
+
+def gjoy(data, l):
+	return bytes([122])
+
+
+def gir(data, l):
+	return bytes([123])
+
+
 def cls(data, l):
 	return bytes([58])
 
@@ -197,7 +209,7 @@ def set_time(data, l):
 
 
 def point(data, l):
-	return setc(data, l, (51, 50))
+	return setc(data, l, (50, 51))
 
 
 def mov(data, l, k1=8, k2=9, k3=10, k4=11, k5=12, k6=13):
