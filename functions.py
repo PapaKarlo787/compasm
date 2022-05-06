@@ -91,6 +91,10 @@ def mod(data, l):
 	return ariphmetics(data, l, 27, 28)
 
 
+def mod(data, l):
+	return ariphmetics(data, l, 124, 125)
+
+
 def jmp(data, l, k1=22, k2=95):
 	try:
 		return bytes([k2]) + args.r(data)
