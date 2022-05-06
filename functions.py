@@ -216,6 +216,14 @@ def point(data, l):
 	return setc(data, l, (50, 51))
 
 
+def ldd(data, l):
+	return bytes([126, args.c(data)])
+
+
+def std(data, l):
+	return bytes([127, args.c(data)])
+
+
 def mov(data, l, k1=8, k2=9, k3=10, k4=11, k5=12, k6=13):
 	if data[2]+data[-1] != "[]" and data[0]+data[-3] != "[]":
 		return ariphmetics(data, l, k3, k4, k1 != 8)
