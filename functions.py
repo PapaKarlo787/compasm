@@ -60,6 +60,10 @@ def and_(data, l):
 	return ariphmetics(data, l, 14, 15)
 
 
+def btest(data, l):
+	return ariphmetics(data, l, 124, 125)
+
+
 def or_(data, l):
 	return ariphmetics(data, l, 16, 17)
 
@@ -89,10 +93,6 @@ def fcmp_(data, l):
 
 def mod(data, l):
 	return ariphmetics(data, l, 27, 28)
-
-
-def mod(data, l):
-	return ariphmetics(data, l, 124, 125)
 
 
 def jmp(data, l, k1=22, k2=95):
