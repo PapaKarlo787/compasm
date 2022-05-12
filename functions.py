@@ -216,12 +216,18 @@ def point(data, l):
 	return setc(data, l, (50, 51))
 
 
-def ldd(data, l):
-	return bytes([126, args.c(data)])
+def ldr(data, l):
+	if len(data) == 3 and data[1] == ",":
+		res = args.r(data[:1])[0] + (args.sr(data[2:]) << 4)
+		return bytes([126, res])
+	raise Exception
 
 
-def std(data, l):
-	return bytes([127, args.c(data)])
+def str_(data, l):
+	if len(data) == 3 and data[1] == ",":
+		res = args.sr(data[:1]) + (args.r(data[2:])[0] << 4)
+		return bytes([126, res])
+	raise Exception
 
 
 def mov(data, l, k1=8, k2=9, k3=10, k4=11, k5=12, k6=13):
@@ -271,7 +277,7 @@ def movb(data, l, k1=44, k2=45, k3=46, k4=47):
 def jc(data, cond, l):
 	bit = 0 if 'n' in cond[0] else 1
 	byte = 0
-	for i in "abzigle":
+	for i in "Iabzigle":
 		byte *= 2
 		byte += bit if i in cond else (bit + 1) % 2
 	result = list(jmp(data, l + 1, 23, 96))
@@ -302,13 +308,13 @@ def send(data, l):
 def circle(data, l):
 	if len(data) == 5 and data[1] == ',':
 		if args.is_reg(data[0]):
-			return args.r(data[:1]) + args.rr(data[2:])
+			return bytes([52]) + args.r(data[:1]) + args.rr(data[2:])
 		else:
 			res = args.c(data[:1])
 			try:
-				return res + args.rr(data[2:])
+				return bytes([54]) + res + args.rr(data[2:])
 			except Exception:
-				return res + args.cc(data[2:])
+				return bytes([53]) + res + args.cc(data[2:])
 
 
 def line(data, l, k=(55,56,57)):

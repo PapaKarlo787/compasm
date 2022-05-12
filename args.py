@@ -6,6 +6,7 @@ reg_re = "r(\d|1[0-5])$"
 int_re = "(0|-?[1-9][0-9]*|0x[0-9a-f]+)$"
 float_re = "-?(0\.\d+|[1-9][0-9]*\.\d+)|" + int_re
 lable_re = "(([a-z]\w*)*\.*[a-z]\w*)|(\$[0-9]+)$"
+spec_regs = {"ip": 0, "sp": 1, "flags": 2}
 nl = 1
 last_lables = []
 
@@ -19,7 +20,9 @@ def is_reg(d):
 
 
 def to_int(n):
-	return int(n, 16 if "x" in n else 10)
+	bases = {"0x": 16, "0o": 8, "0b": 2}
+	base = bases[n[:2]] if n[:2] in bases else 10
+	return int(n, base)
 
 
 def get_const(data, l, to_rebuild, k):
@@ -70,6 +73,12 @@ def cc(data):
 def r(data):
 	if len(data) == 1 and re.match(reg_re, data[0]):
 		return bytes([int(data[0][1:])])
+	raise Exception
+
+
+def sr(data):
+	if len(data) == 1 and data[0] in spec_regs:
+		return spec_regs[data[0]]
 	raise Exception
 
 
