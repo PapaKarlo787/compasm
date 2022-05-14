@@ -14,7 +14,7 @@ commands = {"add": add, "sub": sub, "mul": mul, "div": div, "mov": mov,
 			"call": call, "ret": ret, "rnd": rnd, "print": print_int,
 			"dd": dd, "movb": movb, "pow": pow_, "point": point,
 			"circle": circle, "line": line, "rect": rect, "cls": cls,
-			"bmp": bmp, "scol": scol, "lprint": lprint, "fmov": fmov,
+			"bmp": bmp, "scond": scond, "lprint": lprint, "fmov": fmov,
 			"fpush": fpush, "fpop": fpop, "shr": shr, "shl": shl,
 			"fadd": fadd, "fsub": fsub, "fmul": fmul, "fdiv": fdiv,
 			"fcmp": fcmp_, "fpow": fpow_, "play": play, "nplay": nplay,
@@ -42,7 +42,7 @@ def manage_line(data):
 		if data[0] in lables:
 			raise Exception("Label '{}' already presents".format(data[0]))
 		lables[data[0]] = len(data_base)
-	elif re.match("jn?(e?g?l?i?a?b?z?)*$", data[0]):
+	elif re.match("jn?(e?g?l?i?a?b?z?I?)*$", data[0]):
 		data_base += jc(data[1:], data[0][1:], len(data_base))
 	elif data[0] == "include" and len(data) == 2 and "\"\"" == data[1][0]+data[1][-1]:
 		nl = args.nl

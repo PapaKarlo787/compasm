@@ -200,7 +200,7 @@ def print_int(data, l):
 	return print_(data, l, 43)
 
 
-def scol(data, l):
+def scond(data, l):
 	return bytes([66]) + args.c(data)
 
 
