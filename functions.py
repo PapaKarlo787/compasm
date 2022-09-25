@@ -177,6 +177,10 @@ def nop(data, l):
 	return bytes([255])
 
 
+def mcp(data, l):
+	return bytes([128]) + args.rr(data)
+
+
 def push(data, l, k1=25, k2=104):
 	try:
 		return bytes([k1]) + args.r(data)
