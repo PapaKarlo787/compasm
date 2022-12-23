@@ -234,10 +234,14 @@ def str_(data, l):
 	raise Exception
 
 
-def mov(data, l, k1=8, k2=9, k3=10, k4=11, k5=12, k6=13):
+def mov(data, l, n=4, k1=8, k2=9, k3=10, k4=11, to_addr=True):
 	if data[2]+data[-1] != "[]" and data[0]+data[-3] != "[]":
 		return ariphmetics(data, l, k3, k4, k1 != 8)
-	return movb(data, l, k1, k2, k5, k6)
+	if args.is_reg(data[-1]) and data[-2] == ",":
+		result = args.get_ea(data[:-2], l, to_rebuild, n, k2)
+		result[1] += int(data[-1][1:])
+		return bytes(result)
+	return lea(data, l, k1, n)
 
 
 def icvtf(data, l):
@@ -259,23 +263,24 @@ def mzer(data, l):
 
 
 def fmov(data, l):
-	return mov(data, l, 83, 84, 85, 86, 87, 88)
+	return mov(data, l, 4, 83, 84, 85, 86)
 
 
 def movw(data, l):
-	return movb(data, l, 99, 100, 101, 102)
+	return mov(data, l, 2)
 
 
-def movb(data, l, k1=44, k2=45, k3=46, k4=47):
+def movb(data, l):
+	return mov(data, l, 1)
+
+
+def lea(data, l, k=12, n=4):
 	if args.is_reg(data[0]) and data[1] == ",":
-		result = args.get_mor(data[2:], l, k1, k3, to_rebuild)
+		result = args.get_ea(data[2:], l, to_rebuild, n, k)
 		result[1] += int(data[0][1:])
-	elif args.is_reg(data[-1]) and data[-2] == ",":
-		result = args.get_mor(data[:-2], l, k2, k4, to_rebuild)
-		result[1] += int(data[-1][1:])
+		return bytes(result)
 	else:
 		raise Exception
-	return bytes(result)
 
 
 def jc(data, cond, l):
@@ -325,7 +330,7 @@ def line(data, l, k=(55,56,57)):
 	if len(data) == 7 and data[3] == ",":
 		res1 = setc(data[:3], l, k[:2])
 		res2 = setc(data[-3:], l, k[:2])
-		if res1[0] != res2[0] and res1[0] < res2[0]:
+		if res1[0] < res2[0]:
 			res2 = bytes([k[2]]) + res2[1:]
 		return res2+res1[1:]
 	raise Exception
@@ -372,8 +377,7 @@ def dd(data, l, f=args._dd):
 			continue
 	res += f(d, l+len(res), to_rebuild)
 	return res
-
-
+	
 def db(data, l):
 	return dd(data, l, args._db)
 
@@ -386,10 +390,18 @@ def df(data, l):
 	return dd(data, l, args._df)
 
 
-def long_(data, l):
-	if re.match(int_re, data[0]):
-		return num_to_bytes(to_int(data[0]))
-	raise Exception
+def rb(data, l, k=1):
+	if len(data) != 1 or not re.match(int_re, data[0]):
+		raise Exception("Wrong operand")
+	return b'\x00' * k * args.to_int(data[0])
+
+
+def rw(data, l):
+	return rb(data, l, 2)
+
+
+def rd(data, l):
+	return rb(data, l, 4)
 
 
 def times(data, l, cmd):

@@ -92,19 +92,35 @@ def jump(c, data, l, to_rebuild):
 	return bytes([c]) + get_const(data, l, to_rebuild, 1)
 
 
-def get_mor(data, l, k1, k2, to_rebuild):
-	data = data[1:-1]
-	res = [0]
-	updated = False
-	for i in range(len(data)):
-		if re.match(reg_re, data[i]):
-			if updated:
-				raise Exception("Two registers is not prohibited")
-			res[0] = int(data[i][1:]) * 16
-			updated = True
-			data[i] = "0"
-	res += get_const(data, l, to_rebuild, 2)
-	return [k2 if updated else k1] + res
+def get_ea(data, l, to_rebuild, n, k):
+	data, res, tmp = data[1:-1], [k, 0, 0], [1, 2, 4]
+	size, scale, r1, r2 = 3, 3, tmp.index(n), 0
+	const = "0"
+	nd = "".join(data).split(",")
+	if not nd or len(nd) > 4:
+		raise Exception("wrong address")
+	if nd[0]:
+		const = nd[0]
+		ll = len(const)
+		i = 0
+		while ll:
+			ll -= len(data[i])
+			i += 1
+		const = data[:i]
+	if len(nd) >= 2 and nd[1]:
+		r1 = int(nd[1][1:])
+		size = tmp.index(n)
+	if len(nd) >= 3 and nd[2]:
+		r2 = int(nd[2][1:])
+		scale = 0
+	if len(nd) == 4 and nd[3]:
+		scale = tmp.index(int(nd[3]))
+		if scale < 0:
+			raise Exception("wrong address")
+	res[1] = ((size << 2) + scale) << 4
+	res[2] = (r2 << 4) + r1
+	res += get_const(const, l, to_rebuild, 3)
+	return res
 
 
 def _db(e, l, to_rebuild):

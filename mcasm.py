@@ -10,7 +10,7 @@ commands = {"add": add, "sub": sub, "mul": mul, "div": div, "mov": mov,
 			"and": and_, "or": or_, "xor": xor, "cmp": cmp_, "int": int_,
 			"jmp": jmp, "loop": loop, "push": push, "pop": pop,
 			"mod": mod, "fprint": print_, "delay": delay, "send": send,
-			"gkey": gkey, "scur": setc, "draw": draw, "long": long_,
+			"gkey": gkey, "scur": setc, "draw": draw,
 			"call": call, "ret": ret, "rnd": rnd, "print": print_int,
 			"dd": dd, "movb": movb, "pow": pow_, "point": point,
 			"circle": circle, "line": line, "rect": rect, "cls": cls,
@@ -23,7 +23,8 @@ commands = {"add": add, "sub": sub, "mul": mul, "div": div, "mov": mov,
 			"pushaf": pushaf, "rpix": rpix, "nop": nop, "mzer": mzer,
 			"test": test, "ftest": ftest, "gtm": get_time, "stm": set_time,
 			"mls": millis, "mcs": micros, "gmice": gmice, "gjoy": gjoy,
-			"gir": gir, "btest": btest, "ldr": ldr, "str": str_, "mcp": mcp}
+			"gir": gir, "btest": btest, "ldr": ldr, "str": str_, "mcp": mcp,
+			"rb": rb, "rw": rw, "rd": rd, "lea": lea}
 
 
 pattern = re.compile(r"\".*\"|\[|\]|\+|\*|-?[\w\.]+|,|:|;.*|-|\$")
@@ -44,7 +45,7 @@ def manage_line(data):
 		lables[data[0]] = len(data_base)
 	elif re.match("jn?(e?g?l?i?a?b?z?I?)*$", data[0]):
 		data_base += jc(data[1:], data[0][1:], len(data_base))
-	elif data[0] == "include" and len(data) == 2 and "\"\"" == data[1][0]+data[1][-1]:
+	elif len(data) == 2 and data[0] == "include" and "\"\"" == data[1][0]+data[1][-1]:
 		nl = args.nl
 		try:
 			start(data[1][1:-1])
@@ -58,8 +59,6 @@ def manage_line(data):
 		raise Exception
 
 
-
-
 def start(fn, visited=[]):
 	args.nl = 1
 	fn = os.path.abspath(fn)
@@ -69,11 +68,7 @@ def start(fn, visited=[]):
 	with open(fn) as f:
 		for l in f:
 			try:
-				l = l.split("\"")
-				for i in range(len(l)):
-					if not i % 2:
-						l[i] = l[i].lower()
-				manage_line(pattern.findall("\"".join(l)))
+				manage_line(pattern.findall(l))
 				args.nl += 1
 			except Exception as e:
 				msg = str(e) if str(e) else "Wrong line"
