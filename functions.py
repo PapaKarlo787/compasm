@@ -208,6 +208,18 @@ def scond(data, l):
 	return bytes([66]) + args.c(data)
 
 
+def rcond(data, l):
+	return bytes([13]) + args.c(data)
+
+
+def krd(data, l):
+	return bytes([87]) + args.r(data)
+
+
+def kwt(data, l):
+	return bytes([88]) + args.r(data)
+
+
 def get_time(data, l):
 	return bytes([116]) + args.r(data)
 
