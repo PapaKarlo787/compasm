@@ -372,6 +372,11 @@ def setc(data, l, k=(37, 38)):
 		return bytes([k[1]]) + args.cc(data)
 
 
+def binclude(data, l):
+	with open(data[0][1:-1], "rb") as f:
+		return f.read()
+
+
 def dd(data, l, f=args._dd):
 	res = b''
 	d = []
