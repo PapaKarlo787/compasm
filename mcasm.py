@@ -25,7 +25,7 @@ commands = {"add": add, "sub": sub, "mul": mul, "div": div, "mov": mov,
 			"mls": millis, "mcs": micros, "gmice": gmice, "gjoy": gjoy,
 			"gir": gir, "btest": btest, "ldr": ldr, "str": str_, "mcp": mcp,
 			"rb": rb, "rw": rw, "rd": rd, "lea": lea, "rcond": rcond,
-			"krd": krd, "kwt": kwt}
+			"krd": krd, "kwt": kwt, "rev": rev}
 
 
 pattern = re.compile(r"\".*\"|\[|\]|\+|\*|-?[\w\.]+|,|:|;.*|-|\$")

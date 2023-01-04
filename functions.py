@@ -170,6 +170,10 @@ def micros(data, l):
 	return bytes([118])
 
 
+def rev(data, l):
+	return bytes([39])
+
+
 def nop(data, l):
 	return bytes([255])
 
