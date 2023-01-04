@@ -117,9 +117,6 @@ def play(data, l):
 def nplay(data, l):
 	return bytes([92])
 
-def draw(data, l):
-	return bytes([39])
-
 
 def ret(data, l):
 	return bytes([41])
