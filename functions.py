@@ -110,6 +110,14 @@ def call(data, l):
 	return jmp(data, l, 40, 98)
 
 
+def sts(data, l):
+	return jmp(data, l, 45, 44)
+
+
+def lds(data, l):
+	return jmp(data, l, 47, 46)
+
+
 def play(data, l):
 	return args.jump(91, data, l, to_rebuild)
 
